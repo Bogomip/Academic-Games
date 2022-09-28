@@ -23,6 +23,10 @@ export class AppComponent implements OnInit, OnChanges {
     { id: 1, name: "Evil", score: 6, log: [] }
   ];
 
+  time: number = 15.00;
+  timerStarted: number  = 0;
+  timer: number = 0;
+
   constructor(
     private gameService: GameService
   ) {}
@@ -33,6 +37,28 @@ export class AppComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
       console.log(changes);
+  }
+
+  startTimer(time: number): void {
+
+    this.time = time;
+    this.timerStarted = new Date().getTime();
+
+    clearInterval(this.timer);
+
+    this.timer = window.setInterval(() => {
+
+      let currentTime: number = new Date().getTime();
+      let elapsed: number = (currentTime - this.timerStarted) / 1000;
+
+      this.time = time - elapsed;
+
+      if(this.time < 0) {
+        this.time = 0;
+        clearInterval(this.timer);
+      }
+    }, 20);
+
   }
 
   /**

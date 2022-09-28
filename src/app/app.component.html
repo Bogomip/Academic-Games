@@ -11,6 +11,7 @@
     <div class="score-sheet__controls--questionstyle"></div>
     <div class="score-sheet__controls--buttons">
       <button (click)="toggleManualMode()">Manual Mode</button>
+      <button (click)="startTimer(15)">Start 15 seconds timer</button>
     </div>
   </div>
 
@@ -22,7 +23,7 @@
 
   <!-- the actual timer -->
   <div class="score-sheet__timer">
-    00:00.00
+    {{ time | number:'2.2-2' }} s
   </div>
 
   <!-- How the game will be setup -->
