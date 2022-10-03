@@ -1,0 +1,29 @@
+.team {
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  height: 100%;
+
+  &__name {
+    font-size: 4rem;
+  }
+
+  &__score {
+    font-size: 10rem;
+  }
+
+  &__current {
+    background-color: red;
+  }
+
+  &__stealing {
+    background-color: yellow;
+  }
+
+  &__beingStoleFrom {
+    background-color: rgba(red, .5);
+  }
+}

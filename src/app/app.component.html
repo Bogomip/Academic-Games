@@ -12,33 +12,41 @@
     <div class="score-sheet__controls--buttons">
       <button (click)="toggleManualMode()">Manual Mode</button>
       <button (click)="startTimer(15)">Start 15 seconds timer</button>
+      <button (click)="startTimer(5)">Start 5 seconds timer</button>
+      <button (click)="endRound()">End Round</button>
+      Current Question: {{ game?.currentQuestion }}
+      Round: {{ game?.currentRound }}
+      Stealing: {{ game?.forStealId !== -1 }}
+      <!-- Mode: {{ mode }} -->
+    </div>
+  </div>
+
+  <div class="score-sheet__gameover" *ngIf="gameService.gameEnded">
+    <div class="score-sheet__gameover--scores">
+      <div class="score-sheet__gameover--title">Game Over</div>
     </div>
   </div>
 
   <!-- the team scores -->
   <div class="score-sheet__teams">
     <!-- teams are a composnent -->
-    <app-team [manual]="manualMode" [team]="team" *ngFor="let team of teams"></app-team>
+    <app-team [manual]="manualMode" [team]="team" [turn]="game!.currentTeam" [stealing]="game!.forStealId" *ngFor="let team of game?.teams"></app-team>
   </div>
 
   <!-- the actual timer -->
-  <div class="score-sheet__timer">
+  <div class="score-sheet__timer" *ngIf="game">
     {{ time | number:'2.2-2' }} s
   </div>
 
   <!-- How the game will be setup -->
-  <div class="score-sheet__setup">
-    <div class="score-sheet__setup--line">Teams</div>
-    <div class="score-sheet__setup--line">(Team Names)</div>
-    <div class="score-sheet__setup--line">Question Style</div>
-    <div class="score-sheet__setup--line">Rounds</div>
-    <div class="score-sheet__setup--line">(Each round style/time/questions etc)</div>
+  <div class="score-sheet__setup" *ngIf="!game">
+    <app-setup></app-setup>
   </div>
 
   <!-- Click right or wrong to say if they team answered correctly -->
   <div class="score-sheet__answer">
-    <div class="score-sheet__answer--correct">&#x2713;</div>
-    <div class="score-sheet__answer--incorrect">&#x2718;</div>
+    <div class="score-sheet__answer--correct" (click)="correct()">&#x2713;</div>
+    <div class="score-sheet__answer--incorrect" (click)="incorrect()">&#x2718;</div>
   </div>
 
   <!-- the footer -->

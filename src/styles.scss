@@ -9,3 +9,16 @@ html {
 body {
 
 }
+
+.input__select {
+  border-radius: .5rem;
+
+  &--short { width: 5rem; }
+}
+
+.input__text {
+  border-radius: .5rem;
+
+  &--short { width: 5rem; }
+  &--medium { width: 10rem; }
+}

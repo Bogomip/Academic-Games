@@ -1,0 +1,97 @@
+<div class="setup__backdrop"></div>
+
+<div class="setup">
+
+  <div class="setup__saved" *ngIf="savedGames.length > 0">
+    <div class="setup__saved--game" *ngFor="let game of savedGames; let i = index" (click)="loadGame(i)">
+      <div class="setup__saved--name">{{ game.name ?? 'No name' }}</div>
+      <div class="setup__saved--data">
+        <div class="setup__saved--title">Rounds</div>
+        <div class="setup__saved--data">{{ game.rounds.length }}</div>
+      </div>
+      <div class="setup__saved--data">
+        <div class="setup__saved--title">Teams</div>
+        <div class="setup__saved--data">{{ game.teams.length }}</div>
+      </div>
+      <div class="setup__saved--data">
+        <div class="setup__saved--button" (click)="deleteFromLocal(i)">X</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="setup__line">
+    <div class="setup__title">Setup Name (optional)</div>
+    <div class="setup__input"><input class="input__text" type="text" [(ngModel)]="gameName"></div>
+  </div>
+
+  <div class="setup__line setup__line--short">
+    <div class="setup__title">Teams</div>
+    <div class="setup__input">
+      <select class="input__select input__select--short" name="teamQuantity" id="teamQuantity" (change)="setTeamCount($event)">
+        <option value="2" [selected]="teams.length === 2">2</option>
+        <option value="3" [selected]="teams.length === 3">3</option>
+        <option value="4" [selected]="teams.length === 4">4</option>
+        <option value="5" [selected]="teams.length === 5">5</option>
+        <option value="6" [selected]="teams.length === 6">6</option>
+        <option value="7" [selected]="teams.length === 7">7</option>
+        <option value="8" [selected]="teams.length === 8">8</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="setup__line setup__line--indent setup__line--medium" *ngFor="let team of teams">
+    <div class="setup__title">Team Name</div>
+    <div class="setup__input"><input class="input__text" type="text" [(ngModel)]="team.teamName"></div>
+  </div>
+
+  <div class="setup__line setup__line--short">
+    <div class="setup__title">Question Style</div>
+    <div class="setup__input">
+      <div class="setup__style" [class.setup__style--selected]="questionStyle === 1" (click)="setQuestionStyle(1)">1</div>
+      <div class="setup__style" [class.setup__style--selected]="questionStyle === 2" (click)="setQuestionStyle(2)">2</div>
+    </div>
+  </div>
+
+  <div class="setup__line setup__line--short">
+    <div class="setup__title">Rounds</div>
+    <div class="setup__input">
+      <select class="input__select input__select--short" name="roundQuantity" id="roundQuantity" (change)="setRoundCount($event)">
+        <option value="2" [selected]="teams.length === 2">2</option>
+        <option value="3" [selected]="teams.length === 3">3</option>
+        <option value="4" [selected]="teams.length === 4">4</option>
+        <option value="5" [selected]="teams.length === 5">5</option>
+        <option value="6" [selected]="teams.length === 6">6</option>
+        <option value="7" [selected]="teams.length === 7">7</option>
+        <option value="8" [selected]="teams.length === 8">8</option>
+      </select>
+    </div>
+  </div>
+
+  <table>
+
+    <tr class="setup__line">
+      <th class="setup__title setup__header">Round</th>
+      <th class="setup__input setup__header">Quickfire</th>
+      <th class="setup__input setup__header">Steal</th>
+      <th class="setup__input setup__header">Number of Questions</th>
+      <th class="setup__input setup__header">Question Point Value</th>
+      <th class="setup__input setup__header">Time per Question</th>
+    </tr>
+
+    <tr class="setup__line" *ngFor="let round of rounds; let i = index">
+      <td class="setup__title">{{ i +1 }}</td>
+      <td class="setup__input"><input class="input__checkbox" type="checkbox" [(ngModel)]="round.quickfire"></td>
+      <td class="setup__input"><input class="input__checkbox" type="checkbox" [(ngModel)]="round.steal"></td>
+      <td class="setup__input"><input class="input__text input__text--short" type="text" [(ngModel)]="round.questions"></td>
+      <td class="setup__input"><input class="input__text input__text--short" type="text" [(ngModel)]="round.questionValue"></td>
+      <td class="setup__input"><input class="input__text input__text--short" type="text" [(ngModel)]="round.questionTime"></td>
+    </tr>
+  </table>
+
+  <div class="setup__line">
+    <div class="setup__input">
+      <button (click)="setGame()">Start new Game</button>
+      <button (click)="saveGameSettings()">Save Game Setup</button>
+    </div>
+  </div>
+</div>
