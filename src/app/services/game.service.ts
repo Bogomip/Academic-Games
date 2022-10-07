@@ -38,6 +38,7 @@ export class GameService {
   newGameSetup(game: Game): void {
     this.gameStarted = true;
     this.game = game;
+    this.nextRound(0);
     this.bannerSubscriptions.next([`Begin!`]);
     this.gameSubscription.next(game);
   }
@@ -199,18 +200,20 @@ export class GameService {
   quickFire: boolean = false;
   order: number[] = [];
 
-  nextRound(): void {
+  nextRound(roundNumber?: number): void {
     let banner: string[] = [];
-    console.log(`round change`);
+
+    console.log(roundNumber);
 
     if(this.game?.currentRound === this.game!.rounds.length) {
       // end of the game
+      console.log(`wrongplace?`);
       this.gameEnded = true;
       banner.push(`Game Over!`);
     } else {
       // next round!
       banner = [`Round ${this.game!.currentRound}`]
-      this.game!.currentRound = this.game!.currentRound + 1;
+      this.game!.currentRound = roundNumber || this.game!.currentRound + 1;
       this.game!.currentQuestion = 1;
 
       if(this.quickfire()) {
