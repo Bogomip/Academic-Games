@@ -20,6 +20,8 @@ export class AppComponent implements OnInit, OnChanges {
   mode: string = ``;
   round: Round | null = null;
 
+  banners: string[] = [];
+
   constructor(
     public gameService: GameService
   ) {
@@ -29,6 +31,13 @@ export class AppComponent implements OnInit, OnChanges {
         this.game = game;
         this.round = this.game.rounds[this.game.currentRound];
         this.mode = this.round.quickfire ? 'Quickfire' : 'Normal';
+      }
+    })
+
+    this.gameService.bannerSubscriptions.subscribe({
+      next: (banner: string[]) => {
+        this.banners.push(...banner);
+        this.launchBanners();
       }
     })
   }
@@ -104,5 +113,28 @@ export class AppComponent implements OnInit, OnChanges {
   // test
   nextTeam(): void {
     this.gameService.nextTeam();
+  }
+
+  bannerTimer: number = -1;
+
+  /**
+   * Times the display of banners, running down the 'banners' object.
+   */
+  launchBanners(): void {
+    // if the timer is already running then dont do anything
+    if(this.bannerTimer !== -1) return;
+    // duration in seconds of a banner
+    const bannerDuration: number = 1;
+    // set the interval
+    this.bannerTimer = window.setInterval(() => {
+      let banner: string = this.banners.shift()!;
+      console.log(banner);
+
+      // check fi thats the last banner and if so clear the timer.
+      if(this.banners.length === 0) {
+        clearInterval(this.bannerTimer);
+        this.bannerTimer = -1;
+      }
+    }, bannerDuration * 1000);
   }
 }
