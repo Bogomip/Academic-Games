@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
+import { Banner } from '../app.component';
 
 export interface Game {
   name?: string;
@@ -23,7 +24,7 @@ export interface Round { id: number; quickfire: boolean; steal: boolean; questio
 export class GameService {
 
   gameSubscription: BehaviorSubject<Game> = new BehaviorSubject<Game>(null!);
-  bannerSubscriptions: BehaviorSubject<string[]> = new BehaviorSubject<string[]>(null!);
+  bannerSubscriptions: BehaviorSubject<Banner[]> = new BehaviorSubject<Banner[]>(null!);
 
   gameStarted: boolean = false;
   public gameEnded: boolean = false;
@@ -39,7 +40,7 @@ export class GameService {
     this.gameStarted = true;
     this.game = game;
     this.nextRound(0);
-    this.bannerSubscriptions.next([`Begin!`]);
+    this.bannerSubscriptions.next([{ text: `Begin!`, time: 1 }]);
     this.gameSubscription.next(game);
   }
 
@@ -201,24 +202,23 @@ export class GameService {
   order: number[] = [];
 
   nextRound(roundNumber?: number): void {
-    let banner: string[] = [];
+    let banner: Banner[] = [];
 
     console.log(roundNumber);
 
     if(this.game?.currentRound === this.game!.rounds.length) {
       // end of the game
-      console.log(`wrongplace?`);
       this.gameEnded = true;
-      banner.push(`Game Over!`);
+      banner.push({ text:`Game Over!`, time: 3 });
     } else {
       // next round!
-      banner = [`Round ${this.game!.currentRound}`]
+      banner = [{ text: `Round ${this.game!.currentRound}`, time: 2 }]
       this.game!.currentRound = roundNumber || this.game!.currentRound + 1;
       this.game!.currentQuestion = 1;
 
       if(this.quickfire()) {
         // quickfiore round coming!
-        banner.push('Quickfire!');
+        banner.push({ text: 'Quickfire!', time: 2 });
 
         // set up the answers array
         for(let i = 0 ; i < this.questionCount() ; i++) {

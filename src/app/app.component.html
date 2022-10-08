@@ -10,10 +10,10 @@
   <div class="score-sheet__controls">
     <div class="score-sheet__controls--questionstyle"></div>
     <div class="score-sheet__controls--buttons">
-      <button (click)="toggleManualMode()">Manual Mode</button>
-      <button (click)="startTimer(15)">Start 15 seconds timer</button>
-      <button (click)="startTimer(5)">Start 5 seconds timer</button>
-      <button (click)="endRound()">End Round</button>
+      <button class="input__button" (click)="toggleManualMode()">Manual Mode</button>
+      <button class="input__button" (click)="startTimer(15)">Start 15 seconds timer</button>
+      <button class="input__button" (click)="startTimer(5)">Start 5 seconds timer</button>
+      <button class="input__button" (click)="endRound()">End Round</button>
       Current Question: {{ game?.currentQuestion }}
       Round: {{ game?.currentRound }}
       Stealing: {{ game?.forStealId !== -1 }}
@@ -43,9 +43,7 @@
     <app-setup></app-setup>
   </div>
 
-  <div class="score-sheet__banner">
-    <div class="score-sheet__banner--text">Round 1</div>
-  </div>
+  <div id="banner" class="score-sheet__banner score-sheet__banner--invisible"></div>
 
   <!-- Click right or wrong to say if they team answered correctly -->
   <div class="score-sheet__answer">

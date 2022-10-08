@@ -2,12 +2,13 @@
 
   position: relative;
 
-  height: 96vh;
-  width: 98vw;
+  height: 100vh;
+  width: 100vw;
 
   display: grid;
   grid-template: 5rem 5rem 1fr 3rem / 1fr 20rem 30rem;
 
+  overflow: hidden;
 
   &__header {
     grid-row: 1 / 2;
@@ -89,6 +90,8 @@
     grid-row: 4 / 5;
     grid-column: 1 / -1;
 
+    height: 100%;
+
     display: flex;
     justify-content: center;
     align-items: center;
@@ -137,11 +140,18 @@
     align-items: center;
     justify-content: center;
 
+    background-color: rgba(gray, .5);
+    font-size: 15rem;
+    font-family: 'Bungee Spice', cursive;
+
+    // added via JS for dynamic banners.
     &--text {
-      animation: fadeIn .2s ease-in-out 0s 1 forwards, bannerOut .2s ease-in-out 1s 1 forwards;
+      animation: fadeIn .2s ease-in-out 0s 1 forwards, bannerOut .2s ease-in-out 2s 1 forwards;
       opacity: 0;
-      font-size: 15rem;
     }
+
+    &--invisible { visibility: hidden; }
+    &--visible { visibility: visible; }
   }
 }
 

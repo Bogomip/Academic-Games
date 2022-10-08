@@ -1,13 +1,16 @@
 *, *::after, *::before {
   box-sizing: border-box;
+  margin: 0;
+  border: 0;
+  padding: 0;
 }
 
 html {
   font-size: 62.5%;
+  font-family: 'Exo', sans-serif;
 }
 
 body {
-
 }
 
 .input__select {
@@ -21,4 +24,23 @@ body {
 
   &--short { width: 5rem; }
   &--medium { width: 10rem; }
+}
+
+
+.input__button {
+  padding: .5rem 1rem;
+  text-align: center;
+  border-radius: .5rem;
+  box-shadow: .2rem 0 .4rem rgba(black, .5);
+  transition: all .2s;
+
+  &:hover {
+    cursor: pointer;
+    filter: brightness(1.05);
+    transform: translateY(-.2rem);
+  }
+
+  &:active {
+    transform: translateY(-.1rem);
+  }
 }

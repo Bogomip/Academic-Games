@@ -1,6 +1,8 @@
 import { Component, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { Game, GameService, Round } from './services/game.service';
 
+export interface Banner { text: string; time: number }
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -20,7 +22,7 @@ export class AppComponent implements OnInit, OnChanges {
   mode: string = ``;
   round: Round | null = null;
 
-  banners: string[] = [];
+  banners: Banner[] = [];
 
   constructor(
     public gameService: GameService
@@ -36,7 +38,7 @@ export class AppComponent implements OnInit, OnChanges {
     })
 
     this.gameService.bannerSubscriptions.subscribe({
-      next: (banner: string[]) => {
+      next: (banner: Banner[]) => {
         this.banners.push(...banner);
         this.launchBanners();
       }
@@ -125,17 +127,45 @@ export class AppComponent implements OnInit, OnChanges {
     // if the timer is already running then dont do anything
     if(this.bannerTimer !== -1) return;
     // duration in seconds of a banner
-    const bannerDuration: number = 1;
+    const bannerDuration: number = 2;
+    // set the banner display to visible...
+    const bannerDiv: HTMLElement = document.getElementById('banner')!;
+    bannerDiv.classList.remove('score-sheet__banner--invisible')
+    bannerDiv.classList.add('score-sheet__banner--visible')
+
+    // fire immediatele the first time.
+    this.createBannerFunction(bannerDiv);
+
+    //  THIS DOESNT YET OBEY THE TIME PART OF THE BANNER
+    //  MAKE IT DO THAT!
+
     // set the interval
     this.bannerTimer = window.setInterval(() => {
-      let banner: string = this.banners.shift()!;
-      console.log(banner);
-
       // check fi thats the last banner and if so clear the timer.
       if(this.banners.length === 0) {
         clearInterval(this.bannerTimer);
+        bannerDiv.innerHTML = "";
+        bannerDiv.classList.add('score-sheet__banner--invisible')
+        bannerDiv.classList.remove('score-sheet__banner--visible')
         this.bannerTimer = -1;
+      } else {
+        this.createBannerFunction(bannerDiv);
       }
+
     }, bannerDuration * 1000);
+  }
+
+  createBannerFunction(parentDiv: HTMLElement): void {
+    let banner: Banner = this.banners.shift()!;
+
+    parentDiv.innerHTML = "";
+
+    // create a new element and add it to the document...
+    let newBanner: HTMLElement = document.createElement('div');
+    newBanner.classList.add('score-sheet__banner--text');
+    newBanner.style.animation = `fadeIn .2s ease-in-out 0s 1 forwards, bannerOut .2s ease-in-out ${banner.time}s 1 forwards`;
+    newBanner.style.opacity = `0`;
+    newBanner.innerText = banner.text;
+    parentDiv.appendChild(newBanner);
   }
 }
