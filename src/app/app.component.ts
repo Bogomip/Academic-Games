@@ -30,7 +30,6 @@ export class AppComponent implements OnInit, OnChanges {
     // get the game object
     this.gameService.gameSubscription.subscribe({
       next: (game: Game) => {
-        console.log(game);
         this.game = game;
         this.round = this.game.rounds[this.game.currentRound - 1];
         this.mode = this.round.quickfire ? 'Quickfire' : 'Normal';
@@ -59,6 +58,10 @@ export class AppComponent implements OnInit, OnChanges {
 
   incorrect(): void {
     if(!this.clickPaused) this.gameService.incorrectAnswer();
+  }
+
+  quickfireTeamChange(): void {
+    this.gameService.nextTeam();
   }
 
   clickPaused: boolean = false;
