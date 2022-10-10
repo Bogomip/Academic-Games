@@ -31,7 +31,7 @@ export class AppComponent implements OnInit, OnChanges {
     this.gameService.gameSubscription.subscribe({
       next: (game: Game) => {
         this.game = game;
-        this.round = this.game.rounds[this.game.currentRound - 1];
+        this.round = this.game.rounds[this.game.currentRound];
         this.mode = this.round.quickfire ? 'Quickfire' : 'Normal';
       }
     })
