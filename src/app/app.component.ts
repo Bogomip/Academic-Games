@@ -13,6 +13,7 @@ export class AppComponent implements OnInit, OnChanges {
   manualMode: boolean = false;
 
   time: number = 15.00;
+  lastTime: number = 15.00;
   timerStarted: number  = 0;
   timer: number = 0;
   outOfTimeAudio: HTMLAudioElement = new Audio('/assets/outOfTime.mp3');
@@ -39,7 +40,7 @@ export class AppComponent implements OnInit, OnChanges {
     this.gameService.bannerSubscriptions.subscribe({
       next: (banner: Banner[]) => {
         this.banners.push(...banner);
-        this.launchBanners();
+        //this.launchBanners();
       }
     })
   }
@@ -53,11 +54,23 @@ export class AppComponent implements OnInit, OnChanges {
   }
 
   correct(): void {
-    if(!this.clickPaused) this.gameService.correctAnswer();
+    if(!this.clickPaused) {
+      this.gameService.correctAnswer();
+
+      if(!this.gameService.quickFire) this.resetTimer();
+    }
   }
 
   incorrect(): void {
-    if(!this.clickPaused) this.gameService.incorrectAnswer();
+    if(!this.clickPaused) {
+      this.gameService.incorrectAnswer();
+
+      if(this.game!.forStealId !== -1) {
+        if(!this.gameService.quickFire) this.startTimer(this.lastTime);
+      } else {
+        if(!this.gameService.quickFire) this.resetTimer();
+      }
+    }
   }
 
   quickfireTeamChange(): void {
@@ -92,6 +105,7 @@ export class AppComponent implements OnInit, OnChanges {
  startTimer(time: number): void {
 
   this.time = time;
+  this.lastTime = time;
   this.timerStarted = new Date().getTime();
 
   clearInterval(this.timer);
@@ -109,6 +123,11 @@ export class AppComponent implements OnInit, OnChanges {
       clearInterval(this.timer);
     }
   }, 20);
+}
+
+resetTimer(): void {
+  clearInterval(this.timer);
+  this.time = this.lastTime;
 }
 
   /**

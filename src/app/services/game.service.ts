@@ -44,8 +44,51 @@ export class GameService {
     this.gameSubscription.next(game);
   }
 
+  inc: number = 0;
+
+  modifyScore(teamId: number, score: number): void {
+    let team: Team = this.game!.teams.find((a: Team) => a.id === teamId)!;
+
+    if(team) {
+      team.score += score;
+      this.gameSubscription.next(this.game!);
+    }
+  }
+
+  modifyName(teamId: number, newName: string): void {
+    let team: Team = this.game!.teams.find((a: Team) => a.id === teamId)!;
+
+    if(team) {
+      team.teamName = newName;
+      this.gameSubscription.next(this.game!);
+    }
+  }
+
+  setTeamInPlay(id: number): void {
+    this.game!.currentTeam = id ? id : 0;
+  }
+
   correctAnswer(): void {
     let team: number = this.game!.currentTeam;
+    this.inc++;
+
+    // do stuff based on quickfire or normal
+    if(this.quickFire) {
+      this.correctAnswerQuickfire();
+      console.log(`${this.inc} ${this.quickFireQuestions}`);
+    } else {
+      team = this.correctAnswerNormal(team);
+    }
+
+    this.game!.teams[team].score += +this.questionValue();
+    this.game!.teams[team].correct++;
+
+    this.nextQuestion();
+  }
+
+  correctAnswerNormal(team: number): number {
+
+    console.log(`${this.inc} Corect Normal`);
 
     if(this.game!.forStealId !== -1) {
       // question was stolen
@@ -53,38 +96,51 @@ export class GameService {
       this.game!.forStealId = -1;
     }
 
-    if(this.quickFire) {
-      // flag this question as having been answered correctly...
-      this.quickFireQuestions[this.game!.currentQuestion] = 1;
-    }
+    return team;
+  }
 
-    this.game!.teams[team].score += +this.questionValue();
-    this.game!.teams[team].correct++;
+  correctAnswerQuickfire(): void {
+    console.log(`${this.inc} Corect Quick`);
+    // flag this question as having been answered correctly...
+    this.quickFireQuestions[this.game!.currentQuestion] = 1;
+  }
+
+  incorrectAnswerQuickfire(): void {
+    console.log(`${this.inc} INCorect Quick`);
+
+    // flag this question as being ASKED but not answered correctly
+    this.quickFireQuestions[this.game!.currentQuestion] = 0;
     this.nextQuestion();
-    console.log(this.order, this.quickFireQuestions);
+  }
+
+
+
+
+  incorrectAnswer(): void {
+    const team: number = this.game!.currentTeam;
+    this.inc++;
+
+    // do stuff based on quickfire or normal
+    if(this.quickFire) {
+      this.incorrectAnswerQuickfire();
+      console.log(`${this.inc} ${this.quickFireQuestions}`);
+    } else {
+      this.incorrectAnswerNormal(team);
+    }
 
   }
 
-  incorrectAnswer(): void {
-    const currentTeam: number = this.game!.currentTeam;
+  incorrectAnswerNormal(team: number): void {
+    console.log(`${this.inc} INCorect Normal`);
 
     if(this.game!.forStealId === -1) {
       // this was the first time it was asked...
       this.game!.teams[this.game!.currentTeam].incorrect += 1;
 
-      if(this.quickFire) {
-        // flag this question as being ASKED but not answered correctly
-        this.quickFireQuestions[this.game!.currentQuestion] = 0;
-        this.nextQuestion();
-        console.log(this.order, this.quickFireQuestions);
-
-        return;
-      }
-
       // if the question is stealable, set up the stealable bit!
       // otherwise just goto the next question.
       if(this.stealable()) {
-        this.game!.forStealId = currentTeam;
+        this.game!.forStealId = team;
       } else {
         this.nextQuestion();
       }
@@ -93,7 +149,7 @@ export class GameService {
     if(this.game!.forStealId !== -1 && this.stealable()) {
       this.game!.forStealId = this.stealTeam(this.game!.forStealId);
 
-      if(this.game!.forStealId === currentTeam) {
+      if(this.game!.forStealId === team) {
         // everyone has had a chance to steal and failed...
         this.game!.forStealId = -1;
         this.nextQuestion();
@@ -101,88 +157,102 @@ export class GameService {
     }
   }
 
+  /**
+   * Directs to the next question Function.
+   */
   nextQuestion(): void {
-    const round: Round = this.currentRound();
-
-    console.log(`here0`);
-
     if(this.quickFire) {
-      console.log(`here00`);
-      if(this.game?.currentQuestion! + 1 >= this.quickFireQuestions.length) {
-        // next round OR next TEAM
-        if(this.order.length > 0) {
-          // next team
-          console.log('next team');
-          this.nextTeam();
-        } else {
-          console.log(`here1`);
-          if(this.quickfireTeamOrder.length > 0) {
-
-            console.log(`here2`);
-
-            // next teams turn at quickfire
-            console.log(this.quickfireTeamOrder);
-            this.quickFireQuestions = [];
-            this.newQuickfireGame(this.quickfireTeamOrder.shift());
-            return;
-          } else {
-            console.log('next round');
-            this.nextRound();
-          }
-
-        }
-      } else {
-        // next question, dont change the team!
-        this.game!.currentQuestion = this.game?.currentQuestion! + 1;
-        let firstTeam: boolean = this.game?.teams.length === this.order.length + 1;
-        console.log(`First Team ${firstTeam}`);
-
-        // check for the next unanswered question...
-        for(let i = this.game!.currentQuestion ; i < this.quickFireQuestions.length ; i++) {
-
-          if(firstTeam) {
-            this.game!.currentQuestion = i;
-            break;
-          } else {
-            // only select incorrect answered questions...
-            if(this.quickFireQuestions[i] === 0) {
-              console.log(`Question ${i + 1}`);
-              this.game!.currentQuestion = i;
-              break;
-            }
-          }
-
-          if(i === this.quickFireQuestions.length -1) {
-            // nothing found, so move onto the next team or round...
-            this.nextTeam();
-            break;
-          }
-        }
-
-
-        this.gameSubscription.next(this.game!);
-      }
+      this.nextQuestionQuickfire();
     } else {
-      // normal round style
-      if(this.game?.currentQuestion! + 1 >= round.questions) {
-        // end of the round...
-        this.nextRound();
-      } else {
-        // next question
-        this.game!.currentQuestion = this.game?.currentQuestion! + 1;
-        this.gameSubscription.next(this.game!);
-      }
-
-      this.nextTeam();
+      this.nextQuestionNormal();
     }
   }
 
-  stealable(): boolean { return this.game!.rounds[this.game!.currentRound].steal };
-  questionValue(): number { return this.game!.rounds[this.game!.currentRound].questionValue };
-  questionCount(): number { return this.game!.rounds[this.game!.currentRound].questions };
-  questionTime(): number { return this.game!.rounds[this.game!.currentRound].questionTime };
-  currentRound(): Round { return this.game!.rounds[this.game!.currentRound] };
-  quickfire(): boolean { return this.game!.rounds[this.game!.currentRound].quickfire };
+  /**
+   * Next Quickfire Question
+   * @returns
+   */
+  nextQuestionQuickfire(): void {
+    const round: Round = this.currentRound();
+
+    console.log(`${this.inc} Next Question Quickfire`);
+
+    if(this.game?.currentQuestion! + 1 >= this.quickFireQuestions.length) {
+      // next round OR next TEAM
+      if(this.order.length > 0) {
+        // next team
+        console.log('${this.inc} next team');
+        this.nextTeam();
+      } else {
+        console.log(`${this.inc} here1`);
+        if(this.quickfireTeamOrder.length > 0) {
+
+          console.log(`${this.inc} here2`);
+
+          // next teams turn at quickfire
+          console.log(`${this.inc} ${this.quickfireTeamOrder}`);
+          this.quickFireQuestions = [];
+          this.newQuickfireGame(this.quickfireTeamOrder.shift());
+          return;
+        } else {
+          console.log('${this.inc} next round');
+          this.nextRound();
+        }
+
+      }
+    } else {
+      // next question, dont change the team!
+      this.game!.currentQuestion = this.game?.currentQuestion! + 1;
+      let firstTeam: boolean = this.game?.teams.length === this.order.length + 1;
+      console.log(`${this.inc} First Team ${firstTeam}`);
+
+      // check for the next unanswered question...
+      for(let i = this.game!.currentQuestion ; i < this.quickFireQuestions.length ; i++) {
+
+        if(firstTeam) {
+          this.game!.currentQuestion = i;
+          break;
+        } else {
+          // only select incorrect answered questions...
+          if(this.quickFireQuestions[i] === 0) {
+            console.log(`${this.inc} Question ${i + 1}`);
+            this.game!.currentQuestion = i;
+            break;
+          }
+        }
+
+        if(i === this.quickFireQuestions.length -1) {
+          // nothing found, so move onto the next team or round...
+          console.log(`${this.inc} NO MORE QUESTIONS`)
+          this.nextTeam();
+          break;
+        }
+      }
+
+      this.gameSubscription.next(this.game!);
+    }
+  }
+
+  /**
+   * Next Normal Question
+   */
+  nextQuestionNormal(): void {
+    const round: Round = this.currentRound();
+
+    console.log(`${this.inc} Next Question Normal`);
+
+    // normal round style
+    if(this.game?.currentQuestion! + 1 >= round.questions) {
+      // end of the round...
+      this.nextRound();
+    } else {
+      // next question
+      this.game!.currentQuestion = this.game?.currentQuestion! + 1;
+      this.gameSubscription.next(this.game!);
+    }
+
+    this.nextTeam();
+  }
 
   firstQuickfireTeam: number = 0;     // id of the current quickfire team
   quickFireQuestions: number[] = []; // array indicating which questions in this quickfire round have been correctly answered.
@@ -201,13 +271,16 @@ export class GameService {
       const firstTeam: boolean = this.game?.teams.length === this.order.length;
 
       if(firstTeam) {
+        console.log(`${this.inc} first team, QF`);
         let teamId: number = this.order.shift()!;
         this.game!.currentTeam = teamId;
         this.game!.currentQuestion = 0
       } else {
         let incorrectAnswers: number[] = this.quickFireQuestions.filter((a: number) => a === 0)
+        console.log(`${this.inc} first team, NOT QF`);
 
-        if(incorrectAnswers.length > 0) {
+        // doesnt work...
+        if(incorrectAnswers.length > 0 && this.order.length > 0) {
           // run through all the teams
           let teamId: number = this.order.shift()!;
           this.game!.currentTeam = teamId;
@@ -225,7 +298,7 @@ export class GameService {
         }
       }
 
-      console.log(this.game!.currentTeam);
+      console.log(`${this.inc} ${this.game!.currentTeam}`);
       return;
     }
 
@@ -282,7 +355,7 @@ export class GameService {
   nextRound(roundNumber?: number): void {
     let banner: Banner[] = [];
 
-    console.log(roundNumber);
+    console.log(`${this.inc} ${roundNumber}`);
 
     if(this.game!.currentRound + 1 === this.game!.rounds.length && this.quickfireTeamOrder.length === 0) {
       // end of the game
@@ -290,22 +363,20 @@ export class GameService {
       banner.push({ text:`Game Over!`, time: 1 });
     } else {
 
-      console.log(this.quickfire(), this.quickfireTeamOrder);
+      console.log(`${this.inc} ${this.quickfire()} ${this.quickfireTeamOrder}`);
 
       if(this.quickfire() && this.quickfireTeamOrder.length > 0) {
         // quickfire game is moving into the next quickfire stage
         // reset the questions
-        console.log("next quickfire team");
-        this.quickFireQuestions = [];
+        console.log(`${this.inc} next quickfire team`);
         this.newQuickfireGame(this.quickfireTeamOrder.shift());
+        this.nextTeam();
         return;
       }
 
       // next round!
       banner = [{ text: `Round ${this.game!.currentRound + 1}`, time: 1 }]
-      console.log(this.game!.currentRound);
       this.game!.currentRound = roundNumber ?? this.game!.currentRound + 1;
-      console.log(this.game!.currentRound);
       this.game!.currentQuestion = 0;
 
       if(this.quickfire()) {
@@ -319,11 +390,11 @@ export class GameService {
         // quickfire team order is in score order, so copy that into the quickfireteam order...
         this.quickfireTeamOrder = [...this.game!.teams.map((a: Team) => a.id)];
         this.quickfireTeamOrder.shift();
-        console.log(this.quickfireTeamOrder);
+        console.log(`${this.inc} ${this.quickfireTeamOrder}`);
 
         this.newQuickfireGame(first);
 
-        console.log(this.order, this.quickFireQuestions);
+        console.log(`${this.inc} ${this.order} ${this.quickFireQuestions}`);
         this.nextTeam();
       } else {
         this.quickFire = false;
@@ -336,6 +407,9 @@ export class GameService {
   }
 
   newQuickfireGame(startingTeam?: number): void {
+    this.quickFire = true;
+    this.quickFireQuestions = [];
+
     // set up the answers array
     for(let i = 0 ; i < this.questionCount() ; i++) {
       this.quickFireQuestions.push(-1);
@@ -344,18 +418,26 @@ export class GameService {
     this.game!.currentQuestion = 0;
 
     // find the first team thenj steals are in team order...
-    let first: number = startingTeam ?? this.game!.teams[0].id;;
+    let first: number = startingTeam ?? this.game!.teams[0].id;
     this.order = [];
 
     for(let i = 0 ; i < this.game!.teams.length ; i++) {
       if(first + i + 1 > this.game!.teams.length) {
-        this.order.push(i - length + first)
+        this.order.push(i - this.game!.teams.length + first)
       } else {
         this.order.push(first + i);
       }
     }
 
-    this.quickFire = true;
+    console.log(this.inc, first, this.game!.teams.length, this.order, this.quickfireTeamOrder);
+
   }
+
+  stealable(): boolean { return this.game!.rounds[this.game!.currentRound].steal };
+  questionValue(): number { return this.game!.rounds[this.game!.currentRound].questionValue };
+  questionCount(): number { return this.game!.rounds[this.game!.currentRound].questions };
+  questionTime(): number { return this.game!.rounds[this.game!.currentRound].questionTime };
+  currentRound(): Round { return this.game!.rounds[this.game!.currentRound] };
+  quickfire(): boolean { return this.game!.rounds[this.game!.currentRound].quickfire };
 
 }

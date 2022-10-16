@@ -73,9 +73,9 @@
       <th class="setup__title setup__header">Round</th>
       <th class="setup__input setup__header">Quickfire</th>
       <th class="setup__input setup__header">Steal</th>
-      <th class="setup__input setup__header">Number of Questions</th>
-      <th class="setup__input setup__header">Question Point Value</th>
-      <th class="setup__input setup__header">Time per Question</th>
+      <th class="setup__input setup__header">Questions</th>
+      <th class="setup__input setup__header">Question Value</th>
+      <!-- <th class="setup__input setup__header">Time per Question</th> -->
     </tr>
 
     <tr class="setup__line" *ngFor="let round of rounds; let i = index">
@@ -84,7 +84,7 @@
       <td class="setup__input"><input class="input__checkbox" type="checkbox" [(ngModel)]="round.steal"></td>
       <td class="setup__input"><input class="input__text input__text--short" type="text" [(ngModel)]="round.questions"></td>
       <td class="setup__input"><input class="input__text input__text--short" type="text" [(ngModel)]="round.questionValue"></td>
-      <td class="setup__input"><input class="input__text input__text--short" type="text" [(ngModel)]="round.questionTime"></td>
+      <!-- <td class="setup__input"><input class="input__text input__text--short" type="text" [(ngModel)]="round.questionTime"></td> -->
     </tr>
   </table>
 

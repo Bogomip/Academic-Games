@@ -23,4 +23,16 @@ export class TeamComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
   }
 
+  modifyScore(score: number): void {
+    this.gameService.modifyScore(this.team.id, score);
+  }
+
+  modifyTeamName(newName: any): void {
+    this.gameService.modifyName(this.team.id, newName.target.value);
+  }
+
+  setTeamInPlay(): void {
+    this.gameService.setTeamInPlay(this.team.id);
+  }
+
 }
