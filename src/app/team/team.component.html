@@ -3,9 +3,9 @@
     <input class="team__name--input" type="text" value="{{team.teamName}}" (keyup)="modifyTeamName($event)">
   </div>
   <div class="team__score">{{ team.score }}</div>
-  <div class="team__controls" *ngIf="manual">
+  <div class="team__controls" *ngIf="hover === team.id">
     <button class="input__button" (click)="modifyScore(-1)">-1</button>
     <button class="input__button" (click)="modifyScore(1)">+1</button>
-    <button class="input__button" (click)="setTeamInPlay()">In Play</button>
+    <button class="input__button" (click)="setTeamInPlay()">Set In Play</button>
   </div>
 </div>

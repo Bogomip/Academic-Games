@@ -4,13 +4,14 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 40rem;
+  width: 60rem;
 
-  font-size: 1.2rem;
+  font-size: 1.4rem;
 
   z-index: 2;
 
-  background-color: aqua;
+  background-image: radial-gradient(circle,  rgba(9,9,121,1) 0%, rgba(0,212,255,1) 100%);
+
   border-radius: 1rem;
   box-shadow: .3rem 0 .6rem rgba(black, .5);
 
@@ -24,6 +25,48 @@
     z-index: 1;
   }
 
+  &__title {
+    color: white;
+    font-weight: bold;
+    margin-right: 2rem;
+    white-space: nowrap;
+  }
+
+  &__team {
+    // border-radius: 1rem;
+
+    &:first-of-type { border-radius: 1rem 1rem 0 0 ;}
+    &:last-of-type { border-radius: 0 0 1rem 1rem;}
+
+    &:nth-of-type(even) { background-color: rgba( 52, 152, 219, .5 ); }
+    &:nth-of-type(odd) { background-color: rgba(255, 195, 0, .5); }
+  }
+
+  &__table {
+    width: 56rem;
+    border-collapse: collapse;
+    padding: 0 2rem;
+    margin: 1rem 2rem;
+
+    box-shadow: .2rem 0 .4rem rgba(black, .5);
+
+    overflow: hidden;
+    border-radius: 1rem;
+
+    tr {
+
+      th, td {
+        text-align: center;
+        padding: .5rem 1rem;
+      }
+
+      padding: .5rem 1rem;
+      &:nth-of-type(even) { background-color: rgba( 52, 152, 219, .5 ); }
+      &:nth-of-type(odd) { background-color: rgba(255, 195, 0, .5); }
+      &:first-of-type { background-color: rgba(255, 195, 0, 1); }
+    }
+  }
+
   &__line {
     display: flex;
     justify-content: space-between;
@@ -32,19 +75,28 @@
 
     &--short { width: 15rem; }
     &--medium { width: 30rem; }
+    &--long { width: 100%; }
     &--indent { margin-left: 1rem; }
+    &--flex { display: flex; align-items: center; justify-content: space-between; }
   }
 
   &__input {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    text-align: center;
+
+    &--inline {
+      display: flex;
+      align-items: baseline;
+    }
+
+    button { margin-right: 1rem; }
   }
 
   &__header {
     font-weight: bold;
+  }
 
-    &:first-of-type { justify-self: start; }
+  &__buttons {
+    margin-bottom: 1rem;
   }
 
   &__saved {
@@ -59,12 +111,19 @@
       justify-content: space-between;
       align-items: center;
 
+      background-color: rgba(gray, .3);
+
       padding: .5rem 1rem;
       border-radius: .5rem;
 
+      transition: all .2s;
+
+      &:not(:last-of-type) { margin-bottom: .3rem; }
+
       &:hover {
         cursor: pointer;
-        background-color: aquamarine;
+        background-color: rgba(255, 195, 0, 1);
+        box-shadow: .2rem 0 .4rem rgba(black, .5);
       }
 
     }
@@ -73,25 +132,68 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      &:not(:last-of-type) { margin-right: 2rem; }
     }
 
     &--name {
+      flex: 1;
       font-weight: bold;
     }
 
     &--button {
-      padding: .2rem .5rem;
+      padding: .2rem 1rem;
       border-radius: .5rem;
-      background-color: orangered;
+
+      &:not(:last-of-type) { margin-right: 1rem; }
 
       &:hover {
         cursor: pointer;
-        filter: brightness(1.05);
+        filter: brightness(1.2);
       }
     }
 
+    &--play { background-color: green; }
+    &--delete { background-color: red; }
+
     &--title {
       font-weight: bold;
+      margin-right: 1rem;
     }
+  }
+
+  &__style {
+    display: flex;
+    transition: all .2s;
+    border-radius: .5rem;
+
+    &--tile {
+      padding: .3rem .5rem;
+      border: 1px solid black;
+      border-radius: .5rem;
+      box-shadow: .1rem 0 .2rem rgba(black, .4);
+      transition: all .2s;
+
+      &:not(:last-of-type) { margin-right: 0rem;}
+    }
+
+    &--selected {
+      background-color: rgba(white, 1);
+    }
+
+    &:hover {
+      cursor: pointer;
+      filter: brightness(1.2);
+
+      & > * {
+        background-color: rgba(white, 1);
+
+        &:nth-child(1) { transform: translateX(-.2rem);}
+        &:nth-child(2) { transform: translateX(-.4rem);}
+        &:nth-child(3) { transform: translateX(-.6rem);}
+        &:nth-child(4) { transform: translateX(-.8rem);}
+      }
+    }
+
+    &:not(:last-of-type) { margin-right: 1rem;}
   }
 }

@@ -7,6 +7,12 @@
 
   height: 100%;
 
+  border-radius: 1rem;
+  overflow: hidden;
+  margin: 0 1rem;
+
+  border: .5rem solid transparent;
+
   &__name {
 
     &--input {
@@ -22,7 +28,10 @@
   }
 
   &__current {
-    background-color: red;
+    transition: all .2s;
+    background-color: rgba(32, 119, 175,1);
+    border: .5rem solid rgba(17, 80, 120, 1);
+    box-shadow: .3rem 0 .6rem rgba(black, .5);
   }
 
   &__stealing {

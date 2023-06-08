@@ -2,23 +2,37 @@
 
   <!-- just the header -->
   <div class="score-sheet__header">
-    Academic Games Scrimmage Control Panel
+    <div class="score-sheet__header--left">
+      Academic Games
+    </div>
+
+    <div class="score-sheet__header--right">
+      <div class="score-sheet__status--row">
+        <div class="score-sheet__status--title">Round</div>
+        <div class="score-sheet__status--data">{{ game.currentRound + 1 }}</div>
+      </div>
+      <div class="score-sheet__status--row">
+        <div class="score-sheet__status--title">Question</div>
+        <div class="score-sheet__status--data">{{ game.currentQuestion + 1 }}</div>
+      </div>
+    </div>
   </div>
 
   <!-- which team goes first, the question setting setc - in game changes that can be made -->
   <!-- this is for making changes during the scrimmage -->
   <div class="score-sheet__controls">
-    <div class="score-sheet__controls--questionstyle"></div>
-    <div class="score-sheet__controls--buttons">
-      <button class="input__button" (click)="toggleManualMode()">Manual Mode</button>
-      <button class="input__button" (click)="startTimer(70)">Start 70 seconds timer</button>
-      <button class="input__button" (click)="startTimer(15)">Start 15 seconds timer</button>
-      <button class="input__button" (click)="resetTimer()">Reset Timer</button>
-      <button class="input__button" (click)="quickfireTeamChange()" *ngIf="gameService.quickFire">Next Quickfire Team</button>
-    </div>
+    Set
+    <div class="score-sheet__controls--time" [class.score-sheet__controls--selected]="lastTime === 15" (click)="setTime(15)">15s</div>
+    <div class="score-sheet__controls--time" [class.score-sheet__controls--selected]="lastTime === 70" (click)="setTime(70)">70s</div>
+    <div class="score-sheet__controls--time score-sheet__controls--custom" (keyup)="setCustomTime($event)">Custom <input class="input__text input__text--short" type="text" value="{{lastTime}}">s</div>
+    Timer
+    <button class="input__button" (click)="beginTimer()" *ngIf="!timer" title="Start Timer">⏵︎</button>
+    <button class="input__button" (click)="pauseTimer()" *ngIf="timer" title="Pause Timer">⏸︎</button>
+    <button class="input__button" (click)="resetTimer()" *ngIf="time !== lastTime" title="Reset Timer">&#8635;</button>
+    <div class="score-sheet__controls--time score-sheet__controls--showscoreboard" *ngIf="scoreboardManuallyDismissed" (click)="repoenGameoverWindow()">Show Scoreboard</div>
   </div>
 
-  <div class="score-sheet__status">
+  <!-- <div class="score-sheet__status">
     <div class="score-sheet__status--row">
       <div class="score-sheet__status--title">Round</div>
       <div class="score-sheet__status--data">{{ game.currentRound + 1 }}</div>
@@ -31,24 +45,42 @@
       <div class="score-sheet__status--title">Mode</div>
       <div class="score-sheet__status--data">{{ gameService.quickFire ? 'Quickfire' : 'Normal' }}</div>
     </div>
-  </div>
+  </div> -->
 
-  <div class="score-sheet__gameover" *ngIf="gameService.gameEnded">
+  <div class="score-sheet__gameover" *ngIf="gameService.gameEnded && showScoreBoard && !scoreboardManuallyDismissed">
     <div class="score-sheet__gameover--scores">
       <div class="score-sheet__gameover--title">Game Over</div>
+      <div class="score-sheet__gameover--row" *ngFor="let team of game.teams">
+        <div class="score-sheet__gameover--teamname">{{ team.teamName }}</div>
+        <div class="score-sheet__gameover--score">{{ team.score }}</div>
+      </div>
+      <div class="score-sheet__gameover--close" (click)="closeGameoverWindow()">Close Window</div>
     </div>
   </div>
 
   <!-- the team scores -->
   <div class="score-sheet__teams">
     <!-- teams are a composnent -->
-    <app-team [manual]="manualMode" [team]="team" [turn]="game!.currentTeam" [stealing]="game!.forStealId" *ngFor="let team of game?.teams"></app-team>
+    <app-team [manual]="manualMode" [team]="team" [turn]="game!.currentTeam" [stealing]="game!.forStealId" [hover]="hovered.id" (mouseenter)="hovered.id = team.id" (mouseleave)="hovered.id = team.id" *ngFor="let team of game?.teams"></app-team>
   </div>
 
   <!-- the actual timer -->
   <div class="score-sheet__timer" *ngIf="game">
+
+    <div class="score-sheet__quickfire" *ngIf="gameService.quickFire">
+        <div class="score-sheet__quickfire--question" *ngFor="let q of gameService.quickFireQuestions; let i = index"
+          [class.score-sheet__quickfire--unasked]="q === -1"
+          [class.score-sheet__quickfire--correct]="q === 1"
+          [class.score-sheet__quickfire--incorrect]="q === 0"
+          [class.score-sheet__quickfire--current]="i === game.currentQuestion"
+        >{{ i + 1 }}</div>
+        <button class="input__button" (click)="quickfireTeamChange()" *ngIf="gameService.quickFire">Next Quickfire Team</button>
+        <div id="score-sheet__quickfire--next" class="score-sheet__quickfire--next" *ngIf="quickfireTip" (click)="dismissQuickfireTip()">Click here when the time is up to switch to the next team if they didnt get through all the questions</div>
+    </div>
+
     <div class="score-sheet__timer--time">{{ time | number:'2.0-0' }}</div>
     <div class="score-sheet__timer--unit">s</div>
+
   </div>
 
   <div id="banner" class="score-sheet__banner score-sheet__banner--invisible"></div>

@@ -12,6 +12,7 @@ export class TeamComponent implements OnInit, OnChanges {
   @Input() manual: boolean = false;
   @Input() turn: number = 0;
   @Input() stealing: number = -1;
+  @Input() hover: number = -1;
 
   constructor(
     private gameService: GameService
@@ -21,6 +22,7 @@ export class TeamComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    console.log(changes);
   }
 
   modifyScore(score: number): void {

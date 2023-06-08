@@ -15,7 +15,7 @@ export class AppComponent implements OnInit, OnChanges {
   time: number = 15.00;
   lastTime: number = 15.00;
   timerStarted: number  = 0;
-  timer: number = 0;
+  timer: number | undefined = 0;
   outOfTimeAudio: HTMLAudioElement = new Audio('/assets/outOfTime.mp3');
 
   game: Game | null = null;
@@ -24,6 +24,10 @@ export class AppComponent implements OnInit, OnChanges {
   round: Round | null = null;
 
   banners: Banner[] = [];
+
+  showScoreBoard: boolean = false;
+  scoreboardManuallyDismissed: boolean = false;
+  hovered: { id: number } = { id: -1 };
 
   constructor(
     public gameService: GameService
@@ -34,6 +38,8 @@ export class AppComponent implements OnInit, OnChanges {
         this.game = game;
         this.round = this.game.rounds[this.game.currentRound];
         this.mode = this.round.quickfire ? 'Quickfire' : 'Normal';
+
+        if(gameService.gameEnded) this.showScoreBoard = true;
       }
     })
 
@@ -47,6 +53,16 @@ export class AppComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
 
+  }
+
+  closeGameoverWindow(): void {
+    this.showScoreBoard = false;
+    this.scoreboardManuallyDismissed = true;
+  }
+
+  repoenGameoverWindow(): void {
+    this.showScoreBoard = true;
+    this.scoreboardManuallyDismissed = false;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -98,6 +114,29 @@ export class AppComponent implements OnInit, OnChanges {
     this.outOfTimeAudio.play();
   }
 
+  setTime(time: number): void {
+    this.resetTimer();
+
+    this.time = time;
+    this.lastTime = time;
+  }
+
+  setCustomTime(event: any): void {
+    let time: number = event.target.value;
+    this.setTime(time);
+  }
+
+  pauseTimer(): void {
+    clearInterval(this.timer);
+    this.timer = undefined;
+  }
+
+  beginTimer(): void {
+    if(this.time) {
+      this.startTimer(this.time);
+    }
+  }
+
   /**
    * Starts the countdown timer on screen
    * @param time
@@ -105,10 +144,10 @@ export class AppComponent implements OnInit, OnChanges {
  startTimer(time: number): void {
 
   this.time = time;
-  this.lastTime = time;
   this.timerStarted = new Date().getTime();
 
   clearInterval(this.timer);
+  this.timer = undefined;
 
   this.timer = window.setInterval(() => {
 
@@ -127,6 +166,7 @@ export class AppComponent implements OnInit, OnChanges {
 
 resetTimer(): void {
   clearInterval(this.timer);
+  this.timer = undefined;
   this.time = this.lastTime;
 }
 
@@ -189,5 +229,20 @@ resetTimer(): void {
     newBanner.style.opacity = `0`;
     newBanner.innerText = banner.text;
     parentDiv.appendChild(newBanner);
+  }
+
+  quickfireTip: boolean = true;
+
+  dismissQuickfireTip(): void {
+
+    const element: HTMLElement | null = document.getElementById('score-sheet__quickfire--next');
+
+    if(element) {
+      element.classList.add('fadeOut');
+
+      window.setTimeout(() => {
+        this.quickfireTip = false;
+      }, 600);
+    }
   }
 }

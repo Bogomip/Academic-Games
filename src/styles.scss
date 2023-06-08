@@ -8,6 +8,10 @@
 html {
   font-size: 62.5%;
   font-family: 'Exo', sans-serif;
+
+  @media screen and (max-width: 1400px) { font-size: 50%; }
+  @media screen and (max-width: 1150px) { font-size: 37.5%; }
+  @media screen and (max-width: 850px) { font-size: 25%; }
 }
 
 body {
@@ -15,6 +19,7 @@ body {
 
 .input__select {
   border-radius: .5rem;
+  padding: .5rem 1rem;
 
   &--short { width: 5rem; }
 }
@@ -25,6 +30,7 @@ body {
 
   &--short { width: 5rem; }
   &--medium { width: 10rem; }
+  &--long { width: 100%; }
 }
 
 
@@ -43,5 +49,39 @@ body {
 
   &:active {
     transform: translateY(-.1rem);
+  }
+}
+
+.input__checkbox {
+  display: none;
+  // checked and unchecked
+  & + label {
+    padding: .2rem 1.2rem;
+    transition: all .2s;
+    border-radius: .5rem;
+    box-shadow: .1rem 0 .2rem black;
+
+    // display: flex;
+    // align-items: center;
+    // justify-content: center;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
+  // checked
+  &:checked {
+    & + label {
+      &::after { content: "\2713"; }
+      background-color: rgb(62, 193, 62);
+    }
+  }
+  // unchcked
+  &:not(:checked) {
+    & + label {
+      &::after { content: "\2716"; }
+      background-color: rgba(255, 0, 0, 0.502);
+    }
   }
 }
