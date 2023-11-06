@@ -12,6 +12,7 @@ export class SetupComponent implements OnInit {
   rounds: Round[] = [];
   questionStyle: 1 | 2 = 1;
   gameName: string = ``;
+  customGame: boolean = false;
 
   savedGames: Game[] = [
     {
@@ -64,6 +65,10 @@ export class SetupComponent implements OnInit {
     this.setTeamCount(2); // set two teams to start
     this.setRoundCount(2); // set two teams to start
     this.getSavedGames();
+  }
+
+  customGameSetup(): void {
+    this.customGame = true;
   }
 
   getSavedGames(): void {

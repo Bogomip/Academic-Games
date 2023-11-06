@@ -1,6 +1,15 @@
 <div class="setup__backdrop"></div>
 
-<div class="setup">
+<div class="setup__quick" *ngIf="!customGame">
+  <div class="setup__quick--item setup__quick--item--set" *ngFor="let game of savedGames; let i = index" (click)="playFromLocal(i)">
+    <p>{{ game.name }}</p>
+  </div>
+  <div class="setup__quick--item setup__quick--item--custom" (click)="customGameSetup()">
+    <p>Setup Custom Game</p>
+  </div>
+</div>
+
+<div class="setup" *ngIf="customGame">
 
   <div class="setup__saved" *ngIf="savedGames.length > 0">
     <div class="setup__saved--game" *ngFor="let game of savedGames; let i = index" (click)="loadGame(i)">
